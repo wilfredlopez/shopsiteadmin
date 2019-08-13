@@ -1,0 +1,5 @@
+TO DEVELOP:
+run at the same time npm run ts and in another terminal run npm run dev.
+
+TO DEPLOY:
+the dist folder should be the one deployed.
