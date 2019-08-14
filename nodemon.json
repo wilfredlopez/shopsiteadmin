@@ -1,5 +1,6 @@
 {
   "env": {
-    "MONGO_DB_URI": "mongodb+srv://listenupstreet:Wilfred2988@cluster0-ef6nu.mongodb.net/mytsapi"
+    "MONGO_DB_URI": "mongodb+srv://listenupstreet:Wilfred2988@cluster0-ef6nu.mongodb.net/mytsapi",
+    "JWT_SECRET": "msjsAFX888SSS9SAZ"
   }
 }

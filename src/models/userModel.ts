@@ -1,15 +1,32 @@
-import { Schema, model } from "mongoose"
+import { Document, Schema, model, Model } from "mongoose"
+import { IUser } from "../interfaces/user"
 
-const userModel = new Schema(
+export interface IUserModel extends IUser, Document {
+  fullName(): string
+}
+
+export const userSchema: Schema<IUserModel> = new Schema(
   {
-    fistname: { type: String },
-    lastname: { type: String },
-    email: { type: String, required: true, lowercase: true, unique: true },
+    firstName: { type: String, required: true },
+    lastName: { type: String, required: true },
+    email: {
+      type: String,
+      required: true,
+      lowercase: true,
+      unique: true,
+      trim: true,
+    },
     password: { type: String, required: true },
+    token: String,
   },
   {
     timestamps: true,
   },
 )
 
-export default model("User", userModel)
+userSchema.methods.fullName = function(): string {
+  return this.firstName.trim() + " " + this.lastName.trim()
+}
+
+const User: Model<IUserModel> = model<IUserModel>("User", userSchema)
+export default User
