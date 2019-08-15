@@ -17,17 +17,26 @@ const requiredHeaderToken = async (
     return sendError()
   }
 
-  const token = await req.headers.authorization.split(" ")[1]
-
-  if (!token || token === "") {
-    return sendError()
+  if (req.headers.authorization) {
+    const token = await req.headers.authorization.split(" ")[1]
+    if (!token || token === "") {
+      return sendError()
+    }
+    if (process.env.JWT_SECRET) {
+      try {
+        await jwt.verify(token, process.env.JWT_SECRET)
+      } catch (error) {
+        return sendError()
+      }
+    } else {
+      console.log("NO JWT SECRET In PROCESS.ENV")
+      sendError()
+    }
+  } else {
+    console.log("NO HEADERS.AUTHORIZATION PRESENT")
+    sendError()
   }
 
-  try {
-    await jwt.verify(token, process.env.JWT_SECRET)
-  } catch (error) {
-    return sendError()
-  }
   next()
 }
 

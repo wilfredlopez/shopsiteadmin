@@ -1,7 +1,7 @@
 import { Request, Response, Router } from "express"
 
 import requiredHeaderToken from "../middlewares/requiredHeaderToken"
-import Product, { IProductModel } from "../models/productModel"
+import Product from "../models/productModel"
 
 const { check, validationResult } = require("express-validator")
 
@@ -62,10 +62,12 @@ class ProductRoutes {
       }
 
       product = { ...req.body, productId: id }
-
-      await product.save()
-
-      res.send(product)
+      if (product) {
+        await product.save()
+        res.send(product)
+      } else {
+        throw new Error("No Product was provided in body")
+      }
     } catch (e) {
       res.json({ error: "Server Error", ...e })
     }
@@ -91,13 +93,23 @@ class ProductRoutes {
   public async getCategory(req: Request, res: Response) {
     const cat = req.params.cat
 
+    var perPage = req.params.perPage || 9
+    var page = req.params.page || 1
+
     try {
       const categoryProducts = await Product.find({ categories: cat })
+        .skip(perPage * page - perPage)
+        .limit(perPage)
       //   const categoryProducts = await Product.$where((p: IProductModel) =>
       //     p.categories.includes(cat),
       //   )
+      const count = await categoryProducts.length
 
-      res.json(categoryProducts)
+      res.json({
+        products: categoryProducts,
+        current: page,
+        pages: Math.ceil(count / perPage),
+      })
     } catch (e) {
       res.json({ error: "Server Error", ...e })
     }

@@ -1,7 +1,8 @@
 import { Request, Response, Router } from "express"
-import Users from "../models/userModel"
+import Users, { IUserModel } from "../models/userModel"
 import requiredHeaderToken from "../middlewares/requiredHeaderToken"
-
+import Order from "../models/ordersModel"
+import Cart from "../models/cartModel"
 const { check, validationResult } = require("express-validator")
 
 const bcrypt = require("bcryptjs")
@@ -15,7 +16,7 @@ class UserRoutes {
   }
 
   public async getUsers(req: Request, res: Response) {
-    const users = await Users.find({})
+    const users = await Users.find({}).select("-password")
     res.send(users)
   }
 
@@ -25,15 +26,31 @@ class UserRoutes {
       return res.status(422).json({ errors: errors.array() })
     }
 
+    const { email, password } = req.body
+    const emailReg = RegExp(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/)
+    const isValidEmail = emailReg.test(email)
+
+    if (!isValidEmail) {
+      return res.status(422).json({ error: "Invalid Email" })
+    }
+
     try {
-      const exist = await Users.find({ email: req.body.email })
+      const exist = await Users.find({ email })
 
       if (exist.length > 0) {
         return res.status(401).json({ error: "Already Exist" })
       }
 
-      const hash = await bcrypt.hashSync(req.body.password, 10)
-      const newUser = await new Users({ ...req.body, password: hash })
+      const hash = await bcrypt.hashSync(password, 10)
+      const newUser = await new Users({
+        ...req.body,
+        profile: {
+          ...req.body.profile,
+          email: req.body.email,
+        },
+        password: hash,
+      })
+
       const user = await newUser.save()
 
       const token: string = await jwt.sign(
@@ -44,7 +61,7 @@ class UserRoutes {
         { expiresIn: "7 days" },
       )
 
-      const createdUser = await Users.findOne({ email: user.email })
+      const createdUser = await Users.findById(user._id)
 
       createdUser.token = token
 
@@ -60,11 +77,18 @@ class UserRoutes {
     const id = req.params.id
     try {
       const user = await Users.findById(id)
+        .select("-password")
+        .populate("orders")
+
+      let Orders: any = []
+      try {
+        Orders = await Order.find({ user: user._id })
+      } catch (error) {}
 
       if (!user) {
         res.status(400).json({ error: "User Not Found" })
       }
-      res.json(user)
+      res.json({ user, Orders })
     } catch (e) {
       res.status(500).json({ error: "Server Error", ...e })
     }
@@ -72,14 +96,15 @@ class UserRoutes {
 
   public async updateUser(req: Request, res: Response) {
     const id = req.params.id
-    let { password } = req.body
-
-    const { firstName, lastName, email } = req.body
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ errors: errors.array() })
+    }
 
     try {
-      const user = await Users.findByIdAndUpdate(
+      const user: IUserModel = await Users.findByIdAndUpdate(
         id,
-        { firstName, lastName, password, email },
+        { ...req.body },
         { new: true },
       )
       if (!user) {
@@ -136,19 +161,73 @@ class UserRoutes {
     }
   }
 
+  public async getUserCart(req: Request, res: Response) {
+    const id = req.params.id
+
+    try {
+      const cart = await Cart.find({ userId: id })
+
+      res.json(cart)
+    } catch (e) {
+      res.json({ error: "Not Found", ...e })
+    }
+  }
+
+  public async addUserCart(req: Request, res: Response) {
+    const id = req.params.id
+
+    try {
+      let options = { upsert: true, new: true, setDefaultsOnInsert: true }
+
+      const cart = await Cart.findOneAndUpdate(
+        { userId: id },
+        {
+          ...req.body,
+        },
+        options,
+      )
+
+      res.json(cart)
+    } catch (e) {
+      res.json({ error: "Server Error", ...e })
+    }
+  }
+
   routes() {
     this.router.get("/login", this.login)
     //GET: api/users/
     this.router.get("/", this.getUsers)
     this.router.post(
       "/",
-      [check("email").isEmail(), check("password").isLength({ min: 5 })],
+      [
+        check("email", "Invalid Email").isEmail(),
+        check("password", "Password lenght most be at least 5").isLength({
+          min: 5,
+        }),
+      ],
       this.createUser,
     )
 
     this.router.get("/:id", this.getUser)
+    this.router.get("/cart/:id", this.getUserCart)
+    this.router.post("/cart/:id", this.addUserCart)
     this.router.delete("/:id", requiredHeaderToken, this.deleteUser)
-    this.router.put("/:id", this.updateUser)
+    this.router.put(
+      "/:id",
+      [
+        check("email", "Invalid Email").isEmail(),
+        check("password", "Password lenght most be at least 5").isLength({
+          min: 5,
+        }),
+        check("_id")
+          .not()
+          .exists(),
+        check("token")
+          .not()
+          .exists(),
+      ],
+      this.updateUser,
+    )
   }
 }
 

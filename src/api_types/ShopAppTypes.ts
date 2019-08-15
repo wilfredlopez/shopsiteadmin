@@ -15,7 +15,7 @@ export interface Address {
 export interface PaymentMethod {
   last4: number
   expirationDate: Date
-  type: string
+  paymentType: string
 }
 
 export type ShippingMethod = "standard" | "expedite"
@@ -33,11 +33,14 @@ export interface OrderDetails {
 
 export interface UserProfile {
   email: string
-  name: string
+  firstName: string
+  lastName: string
+  createdAt: Date
+  updatedAt: Date
   phoneNumber: number
   dateOfBirth?: Date
-  shippingInformation: Address
-  billingInformation: Address
+  shippingInformation?: Address
+  billingInformation?: Address
   orders: Order[]
 }
 
@@ -54,13 +57,16 @@ export interface Order {
   amount: number
   paymentMethod: PaymentMethod
   status: OrderStatus
-  number: string
+  orderNumber: string
   orderDetails: OrderDetails
 }
 
 export interface Account {
   cart: Cart
   profile: UserProfile
+  email: string
+  password: string
+  token?: string
 }
 
 export interface AuthInfo {
@@ -91,12 +97,25 @@ export interface Product {
   updatedAt: Date
 }
 
+export interface CartProduct {
+  productId: string
+  price: number
+  msrp: number
+  name: string
+  brand: string
+  taxClass: string
+  description: string
+  imgUrl: string
+  img_thumb?: string
+}
+
 export interface CartItem {
-  product: Product
+  product: CartProduct
   qty: number
 }
 
 export interface Cart {
+  userId: String
   cartItems: CartItem[]
   total: number
 }

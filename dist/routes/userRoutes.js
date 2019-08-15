@@ -14,6 +14,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const userModel_1 = __importDefault(require("../models/userModel"));
 const requiredHeaderToken_1 = __importDefault(require("../middlewares/requiredHeaderToken"));
+const ordersModel_1 = __importDefault(require("../models/ordersModel"));
+const cartModel_1 = __importDefault(require("../models/cartModel"));
 const { check, validationResult } = require("express-validator");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -24,7 +26,7 @@ class UserRoutes {
     }
     getUsers(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const users = yield userModel_1.default.find({});
+            const users = yield userModel_1.default.find({}).select("-password");
             res.send(users);
         });
     }
@@ -34,18 +36,24 @@ class UserRoutes {
             if (!errors.isEmpty()) {
                 return res.status(422).json({ errors: errors.array() });
             }
+            const { email, password } = req.body;
+            const emailReg = RegExp(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/);
+            const isValidEmail = emailReg.test(email);
+            if (!isValidEmail) {
+                return res.status(422).json({ error: "Invalid Email" });
+            }
             try {
-                const exist = yield userModel_1.default.find({ email: req.body.email });
+                const exist = yield userModel_1.default.find({ email });
                 if (exist.length > 0) {
                     return res.status(401).json({ error: "Already Exist" });
                 }
-                const hash = yield bcrypt.hashSync(req.body.password, 10);
-                const newUser = yield new userModel_1.default(Object.assign({}, req.body, { password: hash }));
+                const hash = yield bcrypt.hashSync(password, 10);
+                const newUser = yield new userModel_1.default(Object.assign({}, req.body, { profile: Object.assign({}, req.body.profile, { email: req.body.email }), password: hash }));
                 const user = yield newUser.save();
                 const token = yield jwt.sign({
                     userId: user._id,
                 }, process.env.JWT_SECRET, { expiresIn: "7 days" });
-                const createdUser = yield userModel_1.default.findOne({ email: user.email });
+                const createdUser = yield userModel_1.default.findById(user._id);
                 createdUser.token = token;
                 yield createdUser.save();
                 res.send(newUser);
@@ -59,11 +67,18 @@ class UserRoutes {
         return __awaiter(this, void 0, void 0, function* () {
             const id = req.params.id;
             try {
-                const user = yield userModel_1.default.findById(id);
+                const user = yield userModel_1.default.findById(id)
+                    .select("-password")
+                    .populate("orders");
+                let Orders = [];
+                try {
+                    Orders = yield ordersModel_1.default.find({ user: user._id });
+                }
+                catch (error) { }
                 if (!user) {
                     res.status(400).json({ error: "User Not Found" });
                 }
-                res.json(user);
+                res.json({ user, Orders });
             }
             catch (e) {
                 res.status(500).json(Object.assign({ error: "Server Error" }, e));
@@ -73,10 +88,12 @@ class UserRoutes {
     updateUser(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const id = req.params.id;
-            let { password } = req.body;
-            const { firstName, lastName, email } = req.body;
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+                return res.status(422).json({ errors: errors.array() });
+            }
             try {
-                const user = yield userModel_1.default.findByIdAndUpdate(id, { firstName, lastName, password, email }, { new: true });
+                const user = yield userModel_1.default.findByIdAndUpdate(id, Object.assign({}, req.body), { new: true });
                 if (!user) {
                     return res.status(404).json({ error: "Not Found" });
                 }
@@ -126,14 +143,57 @@ class UserRoutes {
             }
         });
     }
+    getUserCart(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const id = req.params.id;
+            try {
+                const cart = yield cartModel_1.default.find({ userId: id });
+                res.json(cart);
+            }
+            catch (e) {
+                res.json(Object.assign({ error: "Not Found" }, e));
+            }
+        });
+    }
+    addUserCart(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const id = req.params.id;
+            try {
+                let options = { upsert: true, new: true, setDefaultsOnInsert: true };
+                const cart = yield cartModel_1.default.findOneAndUpdate({ userId: id }, Object.assign({}, req.body), options);
+                res.json(cart);
+            }
+            catch (e) {
+                res.json(Object.assign({ error: "Server Error" }, e));
+            }
+        });
+    }
     routes() {
         this.router.get("/login", this.login);
         //GET: api/users/
         this.router.get("/", this.getUsers);
-        this.router.post("/", [check("email").isEmail(), check("password").isLength({ min: 5 })], this.createUser);
+        this.router.post("/", [
+            check("email", "Invalid Email").isEmail(),
+            check("password", "Password lenght most be at least 5").isLength({
+                min: 5,
+            }),
+        ], this.createUser);
         this.router.get("/:id", this.getUser);
+        this.router.get("/cart/:id", this.getUserCart);
+        this.router.post("/cart/:id", this.addUserCart);
         this.router.delete("/:id", requiredHeaderToken_1.default, this.deleteUser);
-        this.router.put("/:id", this.updateUser);
+        this.router.put("/:id", [
+            check("email", "Invalid Email").isEmail(),
+            check("password", "Password lenght most be at least 5").isLength({
+                min: 5,
+            }),
+            check("_id")
+                .not()
+                .exists(),
+            check("token")
+                .not()
+                .exists(),
+        ], this.updateUser);
     }
 }
 const userRoutes = new UserRoutes();

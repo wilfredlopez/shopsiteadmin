@@ -8,6 +8,7 @@ import cors from "cors"
 import indexRoutes from "./routes/indexRoutes"
 import userRoutes from "./routes/userRoutes"
 import productRoutes from "./routes/productRoutes"
+import orderRoutes from "./routes/orderRoutes"
 
 class Server {
   app: express.Application
@@ -42,6 +43,7 @@ class Server {
     this.app.use("/", indexRoutes)
     this.app.use("/api/users", userRoutes)
     this.app.use("/api/products", productRoutes)
+    this.app.use("/api/orders", orderRoutes)
   }
 
   start() {

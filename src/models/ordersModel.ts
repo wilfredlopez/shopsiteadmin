@@ -1,20 +1,59 @@
-import { Schema, model, Model } from "mongoose"
+import { Schema, model, Model, Document } from "mongoose"
 
-const orderModel: Schema = new Schema(
+import { Order } from "../api_types/ShopAppTypes"
+
+export interface IOrderModel extends Order, Document {
+  //methods here
+}
+
+const orderModel: Schema<IOrderModel> = new Schema<IOrderModel>(
   {
-    orderNumber: { type: Number, required: true },
-    totalPrice: { type: Number, required: true },
-    itemsQty: { type: Number, required: true },
+    amount: Number,
+    status: String,
+    orderNumber: { type: String, required: true },
+    paymentMethod: {
+      expirationDate: { type: Date },
+      last4: { type: Number },
+      paymentType: String,
+    },
+    orderDetails: {
+      billingAddress: {
+        address: String,
+        apt: String,
+        city: String,
+        country: String,
+        state: String,
+        zipcode: String,
+        stateShortName: String,
+      },
+      items: [],
+      salesTax: Number,
+      shippingAddress: {
+        address: String,
+        apt: String,
+        city: String,
+        country: String,
+        state: String,
+        zipcode: String,
+        stateShortName: String,
+      },
+      shippingDate: String,
+      shippingMethod: String,
+      subTotal: Number,
+      trackingNumber: String,
+      totalPrice: { type: Number, required: true },
+      itemsQty: { type: Number, required: true },
+    },
     user: {
       type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
-    products: { type: Schema.Types.ObjectId, ref: "Product", required: true },
   },
   {
     timestamps: true,
   },
 )
 
-export default model("Order", orderModel)
+const Order: Model<IOrderModel> = model<IOrderModel>("Order", orderModel)
+export default Order
