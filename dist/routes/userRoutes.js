@@ -169,7 +169,7 @@ class UserRoutes {
         });
     }
     routes() {
-        this.router.get("/login", this.login);
+        this.router.post("/login", this.login);
         //GET: api/users/
         this.router.get("/", this.getUsers);
         this.router.post("/", [
