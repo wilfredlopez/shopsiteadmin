@@ -28,6 +28,7 @@ export const userSchema: Schema<IUserModel> = new Schema<IUserModel>(
       email: { type: String },
       firstName: { type: String, required: true },
       lastName: { type: String, required: true },
+      password: String,
       phoneNumber: Number,
       dateOfBirth: Date,
       shippingInformation: {

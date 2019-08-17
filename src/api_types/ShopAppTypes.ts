@@ -36,6 +36,7 @@ export interface UserProfile {
   firstName: string
   lastName: string
   createdAt: Date
+  password?: string
   updatedAt: Date
   phoneNumber: number
   dateOfBirth?: Date

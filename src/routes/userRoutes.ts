@@ -47,6 +47,7 @@ class UserRoutes {
         profile: {
           ...req.body.profile,
           email: req.body.email,
+          password: hash,
         },
         password: hash,
       })
