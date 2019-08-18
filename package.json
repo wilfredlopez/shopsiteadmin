@@ -10,9 +10,7 @@
     "build": "cd react-ui/ && npm install && npm install --only=dev --no-shrinkwrap && npm run build",
     "postinstall": "npm run build-ts",
     "start": "npm run serve",
-    "serve": "node dist/server.js",
-    "client": "npm run build --prefix react-ui",
-    "client-install": "npm install --prefix react-ui"
+    "serve": "node dist/server.js"
   },
   "keywords": [
     "API"
