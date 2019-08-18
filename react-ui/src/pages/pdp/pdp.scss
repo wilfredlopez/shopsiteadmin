@@ -1,0 +1,29 @@
+.pdp_main_grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  margin-top: 2.5rem;
+}
+
+.pdp_image_container {
+  width: 400px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: auto;
+}
+.pdp_image {
+  max-width: 100%;
+}
+
+.pdp_details_area {
+  display: flex;
+}
+
+.space {
+  width: 2px;
+}
+
+.pdp_lower_section {
+  margin-top: 1rem;
+  padding: 2rem;
+}

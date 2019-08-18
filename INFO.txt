@@ -1,5 +1,10 @@
 TO DEVELOP:
 run at the same time npm run ts and in another terminal run npm run dev.
 
+Client: 
+Add the frontend code in the client folder
+
 TO DEPLOY:
 the dist folder should be the one deployed.
+
+

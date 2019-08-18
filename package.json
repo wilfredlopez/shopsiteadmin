@@ -7,9 +7,10 @@
     "build-ts": "tsc",
     "ts": "tsc -w",
     "dev": "nodemon dist/server.js",
-    "postinstall": "npm run build-ts",
+    "postinstall": "npm run build-ts && npm run client",
     "start": "npm run serve",
-    "serve": "node dist/server.js"
+    "serve": "node dist/server.js",
+    "client": "npm run build --prefix react-ui"
   },
   "keywords": [
     "API"

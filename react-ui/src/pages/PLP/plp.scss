@@ -1,0 +1,29 @@
+.pdp_product_img_container {
+  width: 400px;
+}
+
+.pdp_product_img {
+  width: 100%;
+}
+
+.product_grid_item {
+  grid-template-columns: 1fr 1fr 1fr;
+  display: grid;
+}
+
+.products_link {
+  text-decoration: none;
+  color: rgb(26, 23, 23);
+}
+.product_product_brandName {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.product_product_name {
+  font-weight: 400;
+  font-size: 0.85em;
+  max-width: 90%;
+}

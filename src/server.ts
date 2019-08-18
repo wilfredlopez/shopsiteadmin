@@ -9,6 +9,7 @@ import indexRoutes from "./routes/indexRoutes"
 import userRoutes from "./routes/userRoutes"
 import productRoutes from "./routes/productRoutes"
 import orderRoutes from "./routes/orderRoutes"
+import path from "path"
 
 class Server {
   app: express.Application
@@ -29,7 +30,9 @@ class Server {
       .catch(e => console.log(e))
     //Settings
     this.app.set("port", process.env.PORT || 5000)
-
+    this.app.use(
+      express.static(path.resolve(__dirname, "..", "react-ui", "build")),
+    )
     //middleware
     this.app.use(cors())
     this.app.use(express.json())
@@ -40,10 +43,10 @@ class Server {
   }
 
   routes() {
-    this.app.use("/", indexRoutes)
     this.app.use("/api/users", userRoutes)
     this.app.use("/api/products", productRoutes)
     this.app.use("/api/orders", orderRoutes)
+    this.app.use("/*", indexRoutes)
   }
 
   start() {
