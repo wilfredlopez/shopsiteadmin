@@ -63,12 +63,28 @@ export class MyForm extends React.PureComponent<FormikProps<UserProfile> & Iprop
           <div style={{ marginTop: 10 }}>
             <Button
               type="submit"
-              color="secondary"
+              color="primary"
               style={{ color: '#fff' }}
               fullWidth
               variant="contained"
             >
               Submit
+            </Button>
+
+            <p style={{ textAlign: 'center', margin: ' 2rem 0' }}>
+              <strong>Or</strong>
+            </p>
+            <Button
+              type="submit"
+              color="secondary"
+              style={{ color: '#fff' }}
+              fullWidth
+              onClick={() => {
+                this.props.history.push('/login')
+              }}
+              variant="contained"
+            >
+              Login
             </Button>
           </div>
         </Form>

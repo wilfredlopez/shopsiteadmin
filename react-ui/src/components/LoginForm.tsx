@@ -57,7 +57,7 @@ export class MyForm extends React.PureComponent<FormikProps<Values> & Iprops> {
           <div style={{ marginTop: 10 }}>
             <Button
               type="submit"
-              color="secondary"
+              color="primary"
               style={{ color: '#fff' }}
               fullWidth
               variant="contained"
@@ -66,7 +66,9 @@ export class MyForm extends React.PureComponent<FormikProps<Values> & Iprops> {
             </Button>
             {errors && this.focusError(errors)}
 
-            <p style={{ textAlign: 'center', margin: ' 2rem 0' }}>Or</p>
+            <p style={{ textAlign: 'center', margin: ' 2rem 0' }}>
+              <strong>Or</strong>
+            </p>
             <Button
               type="submit"
               color="secondary"
