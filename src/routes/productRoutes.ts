@@ -39,6 +39,19 @@ class ProductRoutes {
     }
   }
 
+  public async getProductByProductId(req: Request, res: Response) {
+    const id = req.params.productId
+    try {
+      const product = await Product.findOne({ productId: id })
+
+      if (!product) {
+        res.status(400).json({ error: "Product Not Found" })
+      }
+      res.json(product)
+    } catch (e) {
+      res.status(500).json({ error: "Server Error", ...e })
+    }
+  }
   public async getProduct(req: Request, res: Response) {
     const id = req.params.id
     try {
@@ -97,7 +110,9 @@ class ProductRoutes {
     var page = req.params.page || 1
 
     try {
-      const categoryProducts = await Product.find({ categories: cat })
+      const categoryProducts = await Product.find({
+        categories: cat.toLowerCase(),
+      })
         .skip(perPage * page - perPage)
         .limit(perPage)
       //   const categoryProducts = await Product.$where((p: IProductModel) =>
@@ -145,6 +160,7 @@ class ProductRoutes {
     )
     this.router.get("/category/:cat", this.getCategory)
     this.router.get("/:id", this.getProduct)
+    this.router.get("/id/:productId", this.getProductByProductId)
     this.router.delete("/:id", requiredHeaderToken, this.deleteProduct)
     this.router.put("/:id", this.updateProduct)
   }

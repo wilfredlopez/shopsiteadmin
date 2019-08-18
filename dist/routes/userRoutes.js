@@ -16,6 +16,7 @@ const userModel_1 = __importDefault(require("../models/userModel"));
 const requiredHeaderToken_1 = __importDefault(require("../middlewares/requiredHeaderToken"));
 const ordersModel_1 = __importDefault(require("../models/ordersModel"));
 const cartModel_1 = __importDefault(require("../models/cartModel"));
+const userModel_2 = __importDefault(require("../models/userModel"));
 const { check, validationResult } = require("express-validator");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -48,7 +49,7 @@ class UserRoutes {
                     return res.status(401).json({ error: "Already Exist" });
                 }
                 const hash = yield bcrypt.hashSync(password, 10);
-                const newUser = yield new userModel_1.default(Object.assign({}, req.body, { profile: Object.assign({}, req.body.profile, { email: req.body.email }), password: hash }));
+                const newUser = yield new userModel_1.default(Object.assign({}, req.body, { profile: Object.assign({}, req.body.profile, { email: req.body.email, password: hash }), password: hash }));
                 const user = yield newUser.save();
                 const token = yield jwt.sign({
                     userId: user._id,
@@ -139,7 +140,7 @@ class UserRoutes {
                 res.status(401).send({ error: "Authentication Failed" });
             }
             catch (err) {
-                res.status(401).send({ error: "Authentication Failed" });
+                res.status(500).send({ error: "Authentication Failed" });
             }
         });
     }
@@ -168,7 +169,29 @@ class UserRoutes {
             }
         });
     }
+    verifyToken(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const token = req.params.token;
+            if (!token) {
+                return res.json({ error: "Token must be provided in url parameters" });
+            }
+            try {
+                const verify = yield jwt.verify(token, process.env.JWT_SECRET);
+                try {
+                    const user = yield userModel_2.default.findById(verify.userId);
+                    return res.json(user);
+                }
+                catch (e) {
+                    return res.status(404).json(Object.assign({ error: "Not Found" }, e));
+                }
+            }
+            catch (e) {
+                res.status(401).json(Object.assign({ error: "You are not Authorized" }, e));
+            }
+        });
+    }
     routes() {
+        this.router.get("/verify/:token", this.verifyToken);
         this.router.post("/login", this.login);
         //GET: api/users/
         this.router.get("/", this.getUsers);

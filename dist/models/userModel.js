@@ -19,6 +19,7 @@ exports.userSchema = new mongoose_1.Schema({
         email: { type: String },
         firstName: { type: String, required: true },
         lastName: { type: String, required: true },
+        password: String,
         phoneNumber: Number,
         dateOfBirth: Date,
         shippingInformation: {

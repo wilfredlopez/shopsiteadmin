@@ -35,10 +35,10 @@ export interface UserProfile {
   email: string
   firstName: string
   lastName: string
-  createdAt: Date
   password?: string
-  updatedAt: Date
-  phoneNumber: number
+  createdAt?: Date
+  updatedAt?: Date
+  phoneNumber?: number
   dateOfBirth?: Date
   shippingInformation?: Address
   billingInformation?: Address
@@ -72,12 +72,15 @@ export interface Account {
 
 export interface AuthInfo {
   isAuth: boolean
-  token: string
-  email: string
-  userId: string
+  token: string | null
+  email: string | null
+  userId: string | null
 }
 
 export interface Product {
+  color?: string
+  size?: string
+  _id: string | any
   categories: string[]
   productId: string
   price: number

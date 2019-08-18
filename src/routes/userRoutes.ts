@@ -3,6 +3,7 @@ import Users, { IUserModel } from "../models/userModel"
 import requiredHeaderToken from "../middlewares/requiredHeaderToken"
 import Order from "../models/ordersModel"
 import Cart from "../models/cartModel"
+import User from "../models/userModel"
 const { check, validationResult } = require("express-validator")
 
 const bcrypt = require("bcryptjs")
@@ -158,7 +159,7 @@ class UserRoutes {
       }
       res.status(401).send({ error: "Authentication Failed" })
     } catch (err) {
-      res.status(401).send({ error: "Authentication Failed" })
+      res.status(500).send({ error: "Authentication Failed" })
     }
   }
 
@@ -194,7 +195,29 @@ class UserRoutes {
     }
   }
 
+  public async verifyToken(req: Request, res: Response) {
+    const token = req.params.token
+
+    if (!token) {
+      return res.json({ error: "Token must be provided in url parameters" })
+    }
+
+    try {
+      const verify = await jwt.verify(token, process.env.JWT_SECRET)
+
+      try {
+        const user = await User.findById(verify.userId)
+        return res.json(user)
+      } catch (e) {
+        return res.status(404).json({ error: "Not Found", ...e })
+      }
+    } catch (e) {
+      res.status(401).json({ error: "You are not Authorized", ...e })
+    }
+  }
+
   routes() {
+    this.router.get("/verify/:token", this.verifyToken)
     this.router.post("/login", this.login)
     //GET: api/users/
     this.router.get("/", this.getUsers)

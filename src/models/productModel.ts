@@ -27,6 +27,7 @@ export const productSchema: Schema<IProductModel> = new Schema(
     ageGroup: String,
     categories: {
       type: [String], //['Men, Cloathing, Women']
+      lowercase: true,
     },
   },
   {
