@@ -12,6 +12,10 @@ export const clearSelected = () => action(ProductsActionTypes.CLEAR_SELECTED)
 // type them properly as well.
 export const fetchSuccess = (data: Product[]) => action(ProductsActionTypes.FETCH_SUCCESS, data)
 export const fetchError = (message: string) => action(ProductsActionTypes.FETCH_ERROR, message)
+
+//cat/subcat
+export const selectSubCategory = (catroute: string) =>
+  action(ProductsActionTypes.SELECT_SUBCATEGORY, catroute)
 export const selectProduct = (product_id: string) =>
   action(ProductsActionTypes.SELECT_PRODUCTS, product_id)
 export const productSelected = (product: ProductSelectedPayload) =>

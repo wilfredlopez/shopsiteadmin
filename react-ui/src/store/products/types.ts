@@ -15,6 +15,7 @@ export enum ProductsActionTypes {
   FETCH_SUCCESS = '@@products/FETCH_SUCCESS',
   FETCH_ERROR = '@@products/FETCH_ERROR',
   SELECT_PRODUCTS = '@@products/SELECT_PRODUCTS',
+  SELECT_SUBCATEGORY = '@@products/SELECT_SUBCATEGORY',
   SELECTED = '@@products/SELECTED',
   CLEAR_SELECTED = '@@products/CLEAR_SELECTED',
 }

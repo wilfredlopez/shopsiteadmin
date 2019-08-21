@@ -14,6 +14,7 @@ export const initialState: ProductsState = {
 const reducer: Reducer<ProductsState> = (state = initialState, action) => {
   switch (action.type) {
     case ProductsActionTypes.FETCH_REQUEST:
+    case ProductsActionTypes.SELECT_SUBCATEGORY:
     case ProductsActionTypes.SELECT_PRODUCTS: {
       return { ...state, loading: true }
     }

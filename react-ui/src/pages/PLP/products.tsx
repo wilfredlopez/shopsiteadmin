@@ -5,25 +5,29 @@ import { RouteComponentProps } from 'react-router'
 import LoadingSpinner from '../../components/data/LoadingSpinner'
 
 import { ApplicationState, ConnectedReduxProps } from '../../store'
-import { ProductSelectedPayload } from '../../store/products/types'
-import { selectProduct, clearSelected } from '../../store/products/actions'
+
+import { selectSubCategory, clearSelected } from '../../store/products/actions'
+import { Product } from '../../api_types/ShopAppTypes'
+import { renderData } from './renderProductList'
+import { Container } from '@material-ui/core'
 
 // import { Dispatch } from 'redux'
 
 // Separate state props + dispatch props to their own interfaces.
 interface PropsFromState {
   loading: boolean
-  selected?: ProductSelectedPayload
+  data?: Product[]
   errors?: string
 }
 
 interface PropsFromDispatch {
-  selectProduct: typeof selectProduct
+  selectSubCategory: typeof selectSubCategory
   clearSelected: typeof clearSelected
 }
 
 interface RouteParams {
   id: string
+  cat: string
 }
 
 // Combine both state + dispatch props - as well as any props we want to pass - in a union type.
@@ -36,7 +40,7 @@ class ProductListingPage extends React.Component<AllProps> {
   public componentDidMount() {
     const { match } = this.props
 
-    this.props.selectProduct(match.params.id)
+    this.props.selectSubCategory(`${match.params.cat}/${match.params.id}`)
   }
 
   public componentWillUnmount() {
@@ -44,8 +48,13 @@ class ProductListingPage extends React.Component<AllProps> {
     this.props.clearSelected()
   }
 
+  private callRenderData() {
+    const { data, loading } = this.props
+    return <React.Fragment>{!loading && data && renderData(data)}</React.Fragment>
+  }
+
   public render() {
-    const { selected, loading } = this.props
+    const { data, loading } = this.props
 
     return (
       <div>
@@ -56,22 +65,19 @@ class ProductListingPage extends React.Component<AllProps> {
                 <LoadingSpinner />
               </div>
             )}
-            {selected && (
-              <React.Fragment>
-                {selected.detail && (
-                  <div>
-                    <section>
-                      {selected.detail.imgUrl && (
-                        <img src={selected.detail.imgUrl} alt={selected.detail.name} />
-                      )}
-                      <div>
-                        <p>{selected.detail.name}</p>
-                      </div>
-                    </section>
-                  </div>
-                )}
-              </React.Fragment>
-            )}
+            <Container maxWidth="md">
+              <div className="my-2">
+                <h1>
+                  <span>{this.props.match.params.cat.toUpperCase()} / </span>
+                  <span> {this.props.match.params.id.toUpperCase()}</span>
+                </h1>
+              </div>
+              {data && (
+                <div className="product_grid">
+                  <React.Fragment>{this.callRenderData()}</React.Fragment>
+                </div>
+              )}
+            </Container>
           </div>
         </div>
       </div>
@@ -85,13 +91,13 @@ class ProductListingPage extends React.Component<AllProps> {
 const mapStateToProps = ({ products }: ApplicationState) => ({
   loading: products.loading,
   errors: products.errors,
-  selected: products.selected,
+  data: products.data,
 })
 
 // mapDispatchToProps is especially useful for constraining our actions to the connected component.
 // You can access these via `this.props`.
 const mapDispatchToProps = {
-  selectProduct,
+  selectSubCategory,
   clearSelected,
 }
 

@@ -25,8 +25,11 @@ export const productSchema: Schema<IProductModel> = new Schema(
     available: { type: Boolean, default: false },
     inventoryOnHand: { type: Number, default: 0 },
     ageGroup: String,
+    mainCategory: { name: { type: String, lowercase: true }, link: String },
     categories: {
-      type: [String], //['Men, Cloathing, Women']
+      type: [
+        { main: String, name: { type: String, lowercase: true }, link: String },
+      ],
       lowercase: true,
     },
   },

@@ -1,6 +1,13 @@
 import { all, call, fork, put, takeEvery, takeLatest } from 'redux-saga/effects'
 import { ProductsActionTypes } from './types'
-import { fetchError, fetchSuccess, selectProduct, productSelected, fetchRequest } from './actions'
+import {
+  fetchError,
+  fetchSuccess,
+  selectProduct,
+  productSelected,
+  fetchRequest,
+  selectSubCategory,
+} from './actions'
 import { callApi } from '../../utils/api'
 import config from '../../config/index'
 
@@ -26,6 +33,29 @@ function* handleFetch(action: ReturnType<typeof fetchRequest>) {
   }
 }
 
+function* handleSelectSub(action: ReturnType<typeof selectSubCategory>) {
+  try {
+    console.log(action.payload)
+    const products = yield call(
+      callApi,
+      'get',
+      API_ENDPOINT,
+      `/products/category/${action.payload}`,
+    )
+
+    if (products.error) {
+      yield put(fetchError(products.error))
+    } else {
+      yield put(fetchSuccess(products.products))
+    }
+  } catch (err) {
+    if (err instanceof Error) {
+      yield put(fetchError(err.stack!))
+    } else {
+      yield put(fetchError('An unknown error occured.'))
+    }
+  }
+}
 function* handleSelect(action: ReturnType<typeof selectProduct>) {
   try {
     //products/category/Men?perPage=3
@@ -61,9 +91,13 @@ function* watchSelectTeam() {
   yield takeLatest(ProductsActionTypes.SELECT_PRODUCTS, handleSelect)
 }
 
+function* watchSelectSub() {
+  yield takeLatest(ProductsActionTypes.SELECT_SUBCATEGORY, handleSelectSub)
+}
+
 // We can also use `fork()` here to split our saga into multiple watchers.
 function* heroesSaga() {
-  yield all([fork(watchFetchRequest), fork(watchSelectTeam)])
+  yield all([fork(watchFetchRequest), fork(watchSelectTeam), fork(watchSelectSub)])
 }
 
 export default heroesSaga

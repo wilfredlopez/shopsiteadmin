@@ -8,7 +8,7 @@ export interface IMegaMenuProps extends RouteComponentProps {}
 function MegaMenu(props: IMegaMenuProps) {
   return (
     <div>
-      <nav className="nav" style={{ display: 'flex', background: '#e5e5e5' }}>
+      <nav className="nav" style={{ display: 'flex', background: 'rgb(246, 244, 244)' }}>
         {/* <ul className="d-flex" style={{ margin: '0', padding: '0' }}>
           {MenuItemsMap}
         </ul> */}

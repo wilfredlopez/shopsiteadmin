@@ -10,7 +10,8 @@ import { ApplicationState } from '../../store'
 import { fetchRequest } from '../../store/products/actions'
 import { Product } from '../../api_types/ShopAppTypes'
 import './plp.scss'
-import { Container } from '@material-ui/core'
+import { Container, Card } from '@material-ui/core'
+import { renderData } from './renderProductList'
 // import { Dispatch } from 'redux'
 
 // Separate state props + dispatch props to their own interfaces.
@@ -49,41 +50,21 @@ class ProductIndexPage extends React.Component<AllProps> {
         <div>
           <div className="products">
             {loading && <div>Loading...</div>}
-            <div>
-              <Link to={`/products/${this.props.cat}/${'Cloathing'}`}>{'Cloathing'}</Link>
-            </div>
-            <div className="product_grid">{this.renderData()}</div>
+            <Container maxWidth="md">
+              <div className="my-2">
+                <h1>{this.props.cat.toUpperCase()}</h1>
+              </div>
+              <div className="product_grid">{this.callRenderData()}</div>
+            </Container>
           </div>
         </div>
       </div>
     )
   }
 
-  private renderData() {
+  private callRenderData() {
     const { data, loading } = this.props
-    return (
-      <React.Fragment>
-        <Container maxWidth="md">
-          <div className="product_grid_item">
-            {!loading &&
-              data.length > 0 &&
-              data.map((product, index) => {
-                return (
-                  <div key={product.productId}>
-                    <div className="pdp_product_img_container">
-                      <img src={product.imgUrl} className="pdp_product_img" alt={product.name} />
-                    </div>
-                    <Link to={`/products/${product.productId}`} className="products_link">
-                      <span className="product_product_brandName">{product.brand}</span>
-                      <span className="product_product_name">{product.name}</span>
-                    </Link>
-                  </div>
-                )
-              })}
-          </div>
-        </Container>
-      </React.Fragment>
-    )
+    return <React.Fragment>{!loading && renderData(data)}</React.Fragment>
   }
 }
 

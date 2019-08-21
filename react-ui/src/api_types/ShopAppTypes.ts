@@ -77,11 +77,33 @@ export interface AuthInfo {
   userId: string | null
 }
 
+export interface IMegaMenuItem {
+  name: string
+  link: string
+  subcategories: ISubCat[]
+}
+
+export interface ISubCat {
+  name: string
+  link: string
+  children: CatChild[]
+}
+
+export interface CatChild {
+  main?: string
+  name: string
+  link: string
+}
+
+//for each  main caterory i create the menu ex. Men | Women
+//for each unique subcat i asign to the main category
+
 export interface Product {
   color?: string
   size?: string
   _id: string | any
-  categories: string[]
+  mainCategory: CatChild
+  categories: CatChild[]
   productId: string
   price: number
   msrp: number
@@ -99,6 +121,18 @@ export interface Product {
   ageGroup?: string | 'Adult' | 'Kids'
   createdAt: Date
   updatedAt: Date
+}
+
+const category: IMegaMenuItem = {
+  name: 'men',
+  link: '/men',
+  subcategories: [
+    {
+      name: 'Cloathing',
+      link: '/men/cloathing',
+      children: [{ name: '', link: '/' }],
+    },
+  ],
 }
 
 export interface CartProduct {

@@ -1,19 +1,38 @@
 .pdp_product_img_container {
   width: 400px;
+  max-width: 100%;
 }
 
 .pdp_product_img {
   width: 100%;
 }
 
+.product_grid {
+  max-width: 100%;
+  display: block;
+  @media screen and (min-width: 769px) {
+    grid-template-columns: 1fr 1fr 1fr;
+    display: grid;
+  }
+}
+
+.my-2 {
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+
 .product_grid_item {
-  grid-template-columns: 1fr 1fr 1fr;
-  display: grid;
+  margin-bottom: 1.7rem;
+  @media screen and (min-width: 769px) {
+    margin-right: 1rem;
+  }
 }
 
 .products_link {
   text-decoration: none;
   color: rgb(26, 23, 23);
+  margin: 0rem 1rem;
+  display: block;
 }
 .product_product_brandName {
   display: block;

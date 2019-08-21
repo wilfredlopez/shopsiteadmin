@@ -15,7 +15,7 @@ import MegaMenu from './MegaMenu'
 import MySideDrawer from './MySideDrawer'
 import { ShoppingBasket } from '@material-ui/icons'
 import { Hidden, Button } from '@material-ui/core'
-import { RouteComponentProps, withRouter } from 'react-router-dom'
+import { RouteComponentProps, withRouter, Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { ApplicationState } from '../store'
 import { AuthState } from '../store/auth/types'
@@ -220,10 +220,10 @@ function HeaderAppBar(props: HeaderCompProps) {
           </Hidden>
           {/* </IconButton> */}
           <Typography className={classes.title} variant="h6" noWrap>
-            <a href="/" className={classes.link}>
+            <Link to="/" className={classes.link}>
               {' '}
-              LopezShop
-            </a>
+              RetailMeNow
+            </Link>
           </Typography>
           {/* MEGAMENU */}
 

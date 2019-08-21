@@ -49,7 +49,7 @@ const PDP = (props: PDPProps) => {
       <div>
         {product && (
           <React.Fragment>
-            <h1>{product.categories[0].toUpperCase()}</h1>
+            <h1>{product.categories[0].name.toUpperCase()}</h1>
             <div className="pdp_main_grid">
               <div className="pdp_grid_two">
                 <div className="pdp_image_container">

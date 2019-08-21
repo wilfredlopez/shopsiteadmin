@@ -2,6 +2,7 @@ import { Request, Response, Router } from "express"
 
 import requiredHeaderToken from "../middlewares/requiredHeaderToken"
 import Product from "../models/productModel"
+import { CatChild } from "../api_types/ShopAppTypes"
 
 const { check, validationResult } = require("express-validator")
 
@@ -103,16 +104,16 @@ class ProductRoutes {
     }
   }
 
-  public async getCategory(req: Request, res: Response) {
-    const cat = req.params.cat
+  public async getSubCategory(req: Request, res: Response) {
+    const catname = req.params.cat
+    const subcat = req.params.subcat
 
     var perPage = req.params.perPage || 9
     var page = req.params.page || 1
 
     try {
-      const categoryProducts = await Product.find({
-        categories: cat.toLowerCase(),
-      })
+      const categoryProducts = await Product.find({})
+
         .skip(perPage * page - perPage)
         .limit(perPage)
       //   const categoryProducts = await Product.$where((p: IProductModel) =>
@@ -121,7 +122,37 @@ class ProductRoutes {
       const count = await categoryProducts.length
 
       res.json({
-        products: categoryProducts,
+        products: categoryProducts.filter(
+          c =>
+            c.mainCategory.name === catname &&
+            c.categories.some(val => val.name == subcat),
+        ),
+        current: page,
+        pages: Math.ceil(count / perPage),
+      })
+    } catch (e) {
+      res.json({ error: "Server Error", ...e })
+    }
+  }
+
+  public async getCategory(req: Request, res: Response) {
+    const catname = req.params.cat
+
+    var perPage = req.params.perPage || 9
+    var page = req.params.page || 1
+
+    try {
+      const categoryProducts = await Product.find({})
+
+        .skip(perPage * page - perPage)
+        .limit(perPage)
+      //   const categoryProducts = await Product.$where((p: IProductModel) =>
+      //     p.categories.includes(cat),
+      //   )
+      const count = await categoryProducts.length
+
+      res.json({
+        products: categoryProducts.filter(c => c.mainCategory.name === catname),
         current: page,
         pages: Math.ceil(count / perPage),
       })
@@ -134,10 +165,40 @@ class ProductRoutes {
     try {
       const products = await Product.find()
       const categories = products.map(p => p.categories)
+      const mainCategories = products.map(p => p.mainCategory)
 
-      const uniques = [...new Set(...categories.map(c => c))]
+      let uniqueMain = []
 
-      res.json(uniques)
+      function verifyIfThere(name: string, main: string): boolean {
+        return (
+          uniqueMain.filter(m => m.name === name && m.main === main).length > 0
+        )
+      }
+
+      let uniquessub: CatChild[] = []
+
+      function verifyIfSubThere(c: CatChild): boolean {
+        return (
+          uniquessub.filter(s => s.main === c.main && s.name === c.name)
+            .length > 0
+        )
+      }
+
+      for (var i of mainCategories) {
+        if (!verifyIfThere(i.name, i.main)) {
+          uniqueMain.push(i)
+        }
+      }
+
+      categories.map(c => {
+        for (var i of c) {
+          if (!verifyIfSubThere(i)) {
+            uniquessub.push(i)
+          }
+        }
+      })
+
+      res.json({ main: uniqueMain, subcategories: uniquessub })
     } catch (e) {
       res.json({ error: "Server Error", ...e })
     }
@@ -159,6 +220,7 @@ class ProductRoutes {
       this.createProduct,
     )
     this.router.get("/category/:cat", this.getCategory)
+    this.router.get("/category/:cat/:subcat", this.getSubCategory)
     this.router.get("/:id", this.getProduct)
     this.router.get("/id/:productId", this.getProductByProductId)
     this.router.delete("/:id", requiredHeaderToken, this.deleteProduct)

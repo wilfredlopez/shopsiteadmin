@@ -1,47 +1,49 @@
 import * as React from 'react'
 import { Link } from 'react-router-dom'
 
-//Ideally we get something like fake data from the server and then Map it
-const FAKEDATA: IMegaMenuItems = {
-  menus: [
-    {
-      name: 'Wilfred',
-      link: '/wilfred',
-      subcategories: [
-        {
-          name: 'Exclusive Services',
-          link: '/exclusive/services.html',
-          children: [
-            {
-              name: 'Fragrance',
-              link: '/wilfred/fragrance',
-            },
-            {
-              name: 'Face Makeup',
-              link: '/wilfred/face-make-up',
-            },
-          ],
-        },
-        {
-          name: 'Men',
-          link: '/categories/men',
-          children: [
-            {
-              name: 'Cloathing',
-              link: '/men/cloathing',
-            },
-            {
-              name: 'Face Makeup',
-              link: '/wilfred/face-make-up',
-            },
-          ],
-        },
-      ],
-    },
-  ],
-}
+import { IMegaMenuItem, CatChild, ISubCat } from '../api_types/ShopAppTypes'
 
-console.log(FAKEDATA)
+import config from '../config'
+
+//Ideally we get something like fake data from the server and then Map it
+// const FAKEDATA: IMegaMenuItem[] = [
+//   {
+//     name: 'Wilfred',
+//     link: '/wilfred',
+//     subcategories: [
+//       {
+//         name: 'Exclusive Services',
+//         link: '/exclusive/services.html',
+//         children: [
+//           {
+//             name: 'Fragrance',
+//             link: '/wilfred/fragrance',
+//           },
+//           {
+//             name: 'Face Makeup',
+//             link: '/wilfred/face-make-up',
+//           },
+//         ],
+//       },
+//       {
+//         name: 'Men',
+//         link: '/categories/men',
+//         children: [
+//           {
+//             name: 'Cloathing',
+//             link: '/men/cloathing',
+//           },
+//           {
+//             name: 'Face Makeup',
+//             link: '/wilfred/face-make-up',
+//           },
+//         ],
+//       },
+//     ],
+//   },
+// ]
+
+// console.log(FAKEDATA)
 
 // const sub: ISubCat = {
 //   name: 'Exclusive Services',
@@ -58,67 +60,50 @@ console.log(FAKEDATA)
 //   ],
 // }
 
-interface IMegaMenuItems {
-  menus: IMegaMenuItem[]
-}
-interface IMegaMenuItem {
-  name: string
-  link: string
-  subcategories: ISubCat[]
-}
+// const FakeMegaMenuItem: IMegaMenuItem = {
+//   name: 'Men',
+//   link: '/categories/men',
+//   subcategories: [
+//     {
+//       name: 'Cloathing',
+//       link: '/categories/men/cloating',
+//       children: [
+//         {
+//           name: 'Pants',
+//           link: '/categories/men/cloathing/pants',
+//         },
+//       ],
+//     },
+//   ],
+// }
 
-interface ISubCat {
-  name: string
-  link: string
-  children: CatChild[]
-}
-
-interface CatChild {
-  name: string
-  link: string
-}
-
-const FakeMegaMenuItem: IMegaMenuItem = {
-  name: 'Men',
-  link: '/categories/men',
-  subcategories: [
-    {
-      name: 'Cloathing',
-      link: '/categories/men/cloating',
-      children: [
-        {
-          name: 'Pants',
-          link: '/categories/men/cloathing/pants',
-        },
-      ],
-    },
-  ],
-}
-
-const FakeMegaMenuItem2: IMegaMenuItem = {
-  name: 'Tech',
-  link: '/categories/tech',
-  subcategories: [
-    {
-      name: 'Apple',
-      link: '/categories/tech/apple',
-      children: [
-        {
-          name: 'New',
-          link: '/categories/tech/apple/new',
-        },
-        {
-          name: 'Used',
-          link: '/categories/tech/apple/used',
-        },
-      ],
-    },
-  ],
-}
+// const FakeMegaMenuItem2: IMegaMenuItem = {
+//   name: 'Tech',
+//   link: '/categories/tech',
+//   subcategories: [
+//     {
+//       name: 'Apple',
+//       link: '/categories/tech/apple',
+//       children: [
+//         {
+//           name: 'New',
+//           link: '/categories/tech/apple/new',
+//         },
+//         {
+//           name: 'Used',
+//           link: '/categories/tech/apple/used',
+//         },
+//       ],
+//     },
+//   ],
+// }
 
 function BuildSubChild(child: CatChild) {
   return (
-    <li className="mob-menu__submenu-item mob-menu__submenu-item--level-3 mob-menu__item level_3_list_item menu_list_item_2_1_1  cat_fragrance-engraving">
+    <li
+      key={child.link}
+      className="mob-menu__submenu-item mob-menu__submenu-item--level-3 mob-menu__item level_3_list_item menu_list_item_2_1_1  cat_fragrance-engraving"
+    >
       <Link
         className="mob-menu__submenu-link mob-menu__submenu-link--level-3 level_3_list_item_link category_link"
         to={child.link}
@@ -131,7 +116,10 @@ function BuildSubChild(child: CatChild) {
 
 function BuildSubCat(subcategory: ISubCat) {
   return (
-    <li className="mob-menu__submenu-item mob-menu__submenu-item--level-2 mob-menu__item nav-item-mobile level_2_list_item menu_list_item_2_1  cat_features">
+    <li
+      key={subcategory.link}
+      className="mob-menu__submenu-item mob-menu__submenu-item--level-2 mob-menu__item nav-item-mobile level_2_list_item menu_list_item_2_1  cat_features"
+    >
       <div className="mob-menu__item-inner mob-menu__item-mobile nav-item-mobile-trigger">
         <Link
           to={subcategory.link}
@@ -169,6 +157,7 @@ function BuildSubCat(subcategory: ISubCat) {
 function BuildMenu(menu: IMegaMenuItem) {
   return (
     <li
+      key={menu.link}
       className={`level_1_list_item menu_list_item_2 main-nav__item cat_${menu.name}`}
       data-page={menu.name}
     >
@@ -194,8 +183,62 @@ function BuildMenu(menu: IMegaMenuItem) {
 }
 
 interface MenuBuilderProps {}
+interface MenuBuilderState {
+  cats: IMegaMenuItem[]
+}
 
-export class MenuBuilder extends React.PureComponent<MenuBuilderProps> {
+export class MenuBuilder extends React.PureComponent<MenuBuilderProps, MenuBuilderState> {
+  constructor(props: MenuBuilderProps) {
+    super(props)
+    this.state = {
+      cats: [],
+    }
+  }
+
+  private async getCatList() {
+    const res = await fetch(`${config.API_ENDPOINT}/api/products/category/list`)
+    const cats: ReturnRes = await res.json()
+    console.log(cats)
+
+    let menuItems: IMegaMenuItem[] = []
+
+    interface ReturnRes {
+      main: CatChild[]
+      subcategories: CatChild[]
+    }
+
+    let cat: IMegaMenuItem
+
+    cats.main.map(c => {
+      cat = {
+        name: c.name,
+        link: c.link,
+        subcategories: [],
+      }
+      return menuItems.push(cat)
+    })
+
+    let subcat: ISubCat
+
+    for (var savedCat of menuItems) {
+      // eslint-disable-next-line
+      cats.subcategories.forEach(sub => {
+        if (savedCat.name === sub.main) {
+          subcat = {
+            name: sub.name,
+            link: sub.link,
+            children: [],
+          }
+          return savedCat.subcategories.push(subcat)
+        }
+      })
+    }
+
+    this.setState({ cats: menuItems })
+  }
+  componentDidMount() {
+    this.getCatList()
+  }
   public render(): React.ReactNode {
     return (
       <div className="main_navigation_wrapper main-nav__wrapper store-skin--version-3">
@@ -203,9 +246,11 @@ export class MenuBuilder extends React.PureComponent<MenuBuilderProps> {
           <div className="navigation js_navigation loyalty-navigation">
             <div className="content">
               <ul className="level_1_list clearfix main-nav" id="navigation_skippy">
-                {/* {BuildMenu(FAKEDATA[0])} */}
-                {BuildMenu(FakeMegaMenuItem)}
-                {BuildMenu(FakeMegaMenuItem2)}
+                {this.state.cats.map(c => {
+                  return BuildMenu(c)
+                })}
+                {/* {BuildMenu(FakeMegaMenuItem)}
+                {BuildMenu(FakeMegaMenuItem2)} */}
               </ul>
             </div>
           </div>
