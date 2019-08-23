@@ -22,7 +22,7 @@ export const productSchema: Schema<IProductModel> = new Schema(
     taxClass: String,
     imgUrl: { type: String, required: true },
     img_thumb: String,
-    available: { type: Boolean, default: false },
+    available: { type: Boolean, default: true },
     inventoryOnHand: { type: Number, default: 0 },
     ageGroup: String,
     mainCategory: { name: { type: String, lowercase: true }, link: String },

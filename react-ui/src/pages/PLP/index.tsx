@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 // import moment from 'moment'
 
@@ -10,7 +9,7 @@ import { ApplicationState } from '../../store'
 import { fetchRequest } from '../../store/products/actions'
 import { Product } from '../../api_types/ShopAppTypes'
 import './plp.scss'
-import { Container, Card } from '@material-ui/core'
+import { Container } from '@material-ui/core'
 import { renderData } from './renderProductList'
 // import { Dispatch } from 'redux'
 

@@ -1,0 +1,3 @@
+productId,ageGroup,available,brand,categories-main,categories-name,categories-link,condition,description,gender,img_thumb,imgUrl,inventoryOnHand,mainCategory-main,mainCategory-link,mainCategory-name,msrp,name,price,searchable,size,taxClass,color,online
+222-222-22,Adult,TRUE,Tommy Hilfiger,men,cloathing|jeans,/men/cloathing|/men/jeans,New,Tommy Jeans Pants,men,imgurl.jpg,imgurl.jpg,200,men,/men,men,95.5,Blue Core Jeans,56.99,TRUE,L,ck2929,blue,TRUE
+222-222-22,Kids,TRUE,Gucci,kids,sweaters,/kids/sweaters,New,Nice Kids Sweater,men,imgurl.jpg,imgurl.jpg,200,kids,/kids,kids,51.2,Kids Sweater Bundle,30.99,TRUE,M,ck2929,red,TRUE

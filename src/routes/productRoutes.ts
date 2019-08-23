@@ -18,6 +18,45 @@ class ProductRoutes {
     res.send(users)
   }
 
+  public async createBulkProducts(req: Request, res: Response) {
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ errors: errors.array() })
+    }
+
+    try {
+      // const exist = await Product.find({ productId: req.body.productId })
+
+      // if (exist.length > 0) {
+      //   return res.status(401).json({ error: "Id Already Exist" })
+      // }
+
+      Product.find({ productId: req.body.productId }, function(err, data) {
+        if (!data) {
+          const model = new Product({ ...req.body })
+          model.save(function(err, data) {
+            res.send({ method: "create", error: err, data: data })
+          })
+        } else {
+          Product.findOneAndUpdate(
+            { productId: req.body.productId },
+            req.body,
+            function() {
+              res.send({ method: "update", error: err, data: data })
+            },
+          )
+        }
+      })
+
+      // const newProduct = await new Product({ ...req.body })
+      // const product = await newProduct.save()
+
+      // res.send(product)
+    } catch (e) {
+      res.status(500).json({ error: "Error creating product", ...e })
+    }
+  }
+
   public async createProduct(req: Request, res: Response) {
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
@@ -36,7 +75,7 @@ class ProductRoutes {
 
       res.send(product)
     } catch (e) {
-      res.status(500).json({ error: "Error creating user", ...e })
+      res.status(500).json({ error: "Error creating product", ...e })
     }
   }
 
@@ -218,6 +257,17 @@ class ProductRoutes {
         check("categories").isLength({ min: 1 }),
       ],
       this.createProduct,
+    )
+    this.router.post(
+      "/bulk",
+      [
+        check("productId")
+          .not()
+          .isEmpty(),
+        check("imgUrl").isLength({ min: 2 }),
+        check("categories").isLength({ min: 1 }),
+      ],
+      this.createBulkProducts,
     )
     this.router.get("/category/:cat", this.getCategory)
     this.router.get("/category/:cat/:subcat", this.getSubCategory)
